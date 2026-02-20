@@ -10,26 +10,27 @@ steps:
         gcloud auth configure-docker northamerica-northeast2-docker.pkg.dev --quiet
 
   - name: gcr.io/cloud-builders/docker
+    id: Build Backend Container Image
     args:
       - build
       - '-t'
-      - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$COMMIT_SHA'
+      - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$SHORT_SHA'
       - .
 
-    id: Build Backend Container Image
   - name: gcr.io/cloud-builders/docker
+    id: Push Backend Image to Artifact Registry
     args:
       - push
-      - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$COMMIT_SHA'
-    id: Push Backend Image to Artifact Registry
+      - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$SHORT_SHA'
 
   - name: gcr.io/cloud-builders/gcloud
+    id: Deploy Backend to Cloud Run
     args:
       - run
       - deploy
       - bank-backend
       - '--image'
-      - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$COMMIT_SHA'
+      - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$SHORT_SHA'
       - '--region'
       - northamerica-northeast2
       - '--platform'
@@ -38,10 +39,8 @@ steps:
       - '8080'
       - '--timeout'
       - '900'
-    id: Deploy Backend to Cloud Run
-
 images:
-  - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$COMMIT_SHA'
+  - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$SHORT_SHA'
 options:
   logging: CLOUD_LOGGING_ONLY
 timeout: 1200s
