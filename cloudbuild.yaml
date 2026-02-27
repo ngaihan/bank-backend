@@ -1,10 +1,10 @@
 steps:
 # Build the image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:$COMMIT_SHA', '.']
+  args: ['build', '-t', 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:local', '.']
 # Push the image to Artifact Registry
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:$COMMIT_SHA']
+  args: ['push', 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:local']
 # Deploy image to Cloud Run
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
@@ -13,8 +13,10 @@ steps:
     - 'deploy'
     - 'han-service-backend'
     - '--image'
-    - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:$COMMIT_SHA'
+    - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:local'
     - '--region'
     - 'northamerica-northeast2'
 images:
-- 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:$COMMIT_SHA'
+- 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:local'
+options:
+  logging: NONE
