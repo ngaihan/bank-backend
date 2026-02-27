@@ -1,46 +1,20 @@
-#  cloudbuild-backend.yaml
-
 steps:
-  - name: gcr.io/cloud-builders/gcloud
-    id: Configure Docker Auth for Artifact Registry
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        gcloud auth configure-docker northamerica-northeast2-docker.pkg.dev --quiet
-
-  - name: gcr.io/cloud-builders/docker
-    id: Build Backend Container Image
-    args:
-      - build
-      - '-t'
-      - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$SHORT_SHA'
-      - .
-
-  - name: gcr.io/cloud-builders/docker
-    id: Push Backend Image to Artifact Registry
-    args:
-      - push
-      - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$SHORT_SHA'
-
-  - name: gcr.io/cloud-builders/gcloud
-    id: Deploy Backend to Cloud Run
-    args:
-      - run
-      - deploy
-      - bank-backend
-      - '--image'
-      - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$SHORT_SHA'
-      - '--region'
-      - northamerica-northeast2
-      - '--platform'
-      - managed
-      - '--port'
-      - '8080'
-      - '--timeout'
-      - '900'
+# Build the image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:$COMMIT_SHA', '.']
+# Push the image to Artifact Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:$COMMIT_SHA']
+# Deploy image to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: 
+    - 'run'
+    - 'deploy'
+    - 'han-service-backend'
+    - '--image'
+    - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:$COMMIT_SHA'
+    - '--region'
+    - 'northamerica-northeast2'
 images:
-  - 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/bank-backend:$SHORT_SHA'
-options:
-  logging: CLOUD_LOGGING_ONLY
-timeout: 1200s
+- 'northamerica-northeast2-docker.pkg.dev/gcp-class-14/han-repository/han-image-backend/han-service-backend:$COMMIT_SHA'
